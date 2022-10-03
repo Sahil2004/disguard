@@ -11,7 +11,7 @@ import Discord from "discord.js";
 const createEmbed = async (
   emoticon: string,
   body: string,
-  channel: Discord.TextBasedChannels,
+  channel: Discord.TextBasedChannels | null,
   type: "warn" | "success" | "info"
 ) => {
   const embed = new Discord.MessageEmbed()
@@ -20,7 +20,9 @@ const createEmbed = async (
     .setColor(
       type === "warn" ? "RED" : type === "success" ? "GREEN" : "LIGHT_GREY"
     );
-  channel.send({ embeds: [embed] });
+    if (channel) {
+      channel.send({ embeds: [embed] });
+    }
 };
 
 /**

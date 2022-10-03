@@ -151,4 +151,45 @@ const HandleHelp = async (msg: Discord.Message) => {
   }
 };
 
-export { HandleHelp };
+/**
+ * Handle the help message and find the manual for this shit
+ *
+ * @param {Discord.CommandInteraction}
+ */
+
+const helpHandler = async (interaction: Discord.CommandInteraction) => {
+  const { channel, options } = interaction;
+  const commandName = options.getString("command");
+  await interaction.reply("Loading help...");
+  if (commandName === null) {
+    let commandsString = "";
+    for (const cmd of commands) {
+      commandsString =
+        commandsString +
+        `\n**${cmd.name}**\ntrigger: \`$${cmd.name}\`\n${cmd.desc}\n`;
+    }
+    createEmbed(
+      "Help is here!",
+      `Disguard is a result of my obsession with linux and linux like commands, the idea is that all mod commands are locked behind a superuser and you only get to be a superuser WHEN you are root, till then all users appear as normal and people behave exactly like they would normally and not when they know they can face consequences\n\nTo get help related to a specific command type\n\`$man <command>\`\n\n**Example**\n\`$man ban\`\n\n**Commands**\n${commandsString}`,
+      channel,
+      "success"
+    );
+  } else {
+    const command = commands.find((cmd) => cmd.name === commandName);
+    if (command) {
+      const embed = new Discord.MessageEmbed()
+        .setTitle(commandName)
+        .setColor("GREEN")
+        .setDescription(
+          `${command.desc}\n\n**Example**\`\`\`${command.example}\`\`\``
+        )
+        .setFields(command.flags);
+      if (channel) {
+        channel.send({ embeds: [embed] });
+      }
+    } 
+  }
+  await interaction.deleteReply();
+};
+
+export { HandleHelp, helpHandler };

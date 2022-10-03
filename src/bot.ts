@@ -1,7 +1,8 @@
 import Discord, { Intents } from "discord.js";
 import { BOT_TOKEN, MONGO_URI } from "./config";
 import { connectToDB } from "./utils/mongo";
-import HandleMessage from "./controllers";
+import { HandleMessage, HandleCommand } from "./controllers/index";
+import { registeringCommands } from "./deployCommands";
 
 const main = async () => {
   await connectToDB(MONGO_URI);
@@ -14,6 +15,13 @@ const main = async () => {
       Intents.FLAGS.GUILD_INTEGRATIONS,
       Intents.FLAGS.GUILD_MESSAGES,
     ],
+  });
+
+  registeringCommands();
+
+  client.on("interactionCreate", async (interaction: Discord.Interaction) => {
+    if (!interaction.isCommand()) return;
+    HandleCommand(interaction);
   });
 
   client.on("messageCreate", (msg: Discord.Message) => {
